@@ -10,12 +10,25 @@ http://www.fullstackjs.com/book/index.html
 
 npm install
 ````
+#### Start MongoDB server
+
+````md
+
+sudo mongod
+````
+
+#### Start MongoDB client
+
+````md
+
+mongo
+````
 
 #### Start app
 
 ````md
 
-npm start
+npm run dev
 ````
 
 Run on: http://localhost:3000/todos
