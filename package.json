@@ -9,6 +9,7 @@
   "dependencies": {
     "acorn": "^6.1.1",
     "bluebird": "^3.5.4",
+    "bootstrap-sass": "^3.4.1",
     "browserify-middleware": "^8.1.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
