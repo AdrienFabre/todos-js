@@ -1,7 +1,7 @@
+var $ = require("jquery");
 var todoTemplate = require("../views/partials/todo.hbs");
 
-var $ = require("jquery");
-
+// update status checkbox event handler
 $("ul").on("change", "li :checkbox", function() {
   var $this = $(this),
     $input = $this[0],
@@ -14,8 +14,12 @@ $("ul").on("change", "li :checkbox", function() {
   });
 });
 
+// add todo event handler
 $(function() {
   $(":button").on("click", addTodo);
+});
+
+$(function() {
   $(":text").on("keypress", function(e) {
     var key = e.keyCode;
     if (key == 13 || key == 169) {
@@ -27,6 +31,7 @@ $(function() {
   });
 });
 
+// update text field event handler
 $("ul").on("keydown", "li span", function(e) {
   var $this = $(this),
     $span = $this[0],
@@ -52,6 +57,7 @@ $("ul").on("keydown", "li span", function(e) {
   }
 });
 
+// delete link click event handler
 $("ul").on("click", "li a", function() {
   var $this = $(this),
     $input = $this[0],
@@ -62,6 +68,7 @@ $("ul").on("click", "li a", function() {
   });
 });
 
+// ajax to add todo
 var addTodo = function() {
   var text = $("#add-todo-text").val();
   $.ajax({
@@ -80,6 +87,7 @@ var addTodo = function() {
   });
 };
 
+// ajax to update todo
 var updateTodo = function(id, data, cb) {
   $.ajax({
     url: "/api/todos/" + id,
@@ -92,6 +100,7 @@ var updateTodo = function(id, data, cb) {
   });
 };
 
+// ajax to delete todo
 var deleteTodo = function(id, cb) {
   $.ajax({
     url: "/api/todos/" + id,
@@ -105,7 +114,59 @@ var deleteTodo = function(id, cb) {
     }
   });
 };
-
 var deleteTodoLi = function($li) {
   $li.remove();
 };
+
+// setup mutation observer
+var initTodoObserver = function() {
+  var target = $("ul")[0];
+  var config = { attributes: true, childList: true, characterData: true };
+  var observer = new MutationObserver(function(mutationRecords) {
+    $.each(mutationRecords, function(index, mutationRecord) {
+      updateTodoCount();
+    });
+  });
+  if (target) {
+    observer.observe(target, config);
+  }
+  updateTodoCount();
+};
+
+// Footer
+// Count
+var updateTodoCount = function() {
+  $(".count").text($("li").length);
+};
+
+// Filter
+$(".filter").on("click", ".show-all", function() {
+  $(".hide").removeClass("hide");
+});
+$(".filter").on("click", ".show-not-done", function() {
+  $(".hide").removeClass("hide");
+  $(".checked")
+    .closest("li")
+    .addClass("hide");
+});
+$(".filter").on("click", ".show-done", function() {
+  $("li").addClass("hide");
+  $(".checked")
+    .closest("li")
+    .removeClass("hide");
+});
+// Clear
+$(".clear").on("click", function() {
+  var $doneLi = $(".checked").closest("li");
+  for (var i = 0; i < $doneLi.length; i++) {
+    var $li = $($doneLi[i]); //you get a li out, and still need to convert into $li
+    var id = $li.attr("id");
+    (function($li) {
+      deleteTodo(id, function() {
+        deleteTodoLi($li);
+      });
+    })($li);
+  }
+});
+
+initTodoObserver();
